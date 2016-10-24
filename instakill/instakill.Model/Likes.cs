@@ -8,7 +8,7 @@ namespace instakill.Model
 {
     public class Likes
     {
-        public int IdPost { get; set; }
-        public int IdUser { get; set; }
+        public Guid PostId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

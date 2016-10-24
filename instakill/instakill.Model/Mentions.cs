@@ -8,7 +8,7 @@ namespace instakill.Model
 {
     public class Mentions
     {
-        public int IdUser { get; set; }
-        public int IdCom { get; set; }
+        public Guid UserId { get; set; }
+        public Guid ComId { get; set; }
     }
 }

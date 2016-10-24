@@ -12,9 +12,9 @@ namespace instakill.Model
         Posts AddPost(Posts post);
         Users GetUser(Guid id);
         Posts GetPost(Guid postId);
-        Comments AddCommentToPost(Comments text, Comments idFrom, Posts idPosts);
+        Comments AddCommentToPost(Guid postId, Comments comment);
         Comments GetPostComments(Guid postId);
-       // Posts GetLatestPosts(Guid id); //по id пользователя
+        //Posts GetLatestPosts(Guid id); //по id пользователя
         Likes AddLike(Likes like);//user - лайкнувший
         Likes GetPostLikes(Guid postId);
 

@@ -1,1 +1,7 @@
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\bin\Debug\instakill.DataLayer.Sql.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\bin\Debug\instakill.DataLayer.Sql.pdb
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\bin\Debug\instakill.Model.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\bin\Debug\instakill.Model.pdb
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\obj\Debug\instakill.DataLayer.Sql.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\obj\Debug\instakill.DataLayer.Sql.pdb
 C:\Users\halop\Desktop\instakill\project\instakill\instakill.DataLayer.Sql\obj\Debug\instakill.DataLayer.Sql.csprojResolveAssemblyReference.cache

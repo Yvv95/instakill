@@ -1,0 +1,11 @@
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\obj\Debug\instakill.Tests.csprojResolveAssemblyReference.cache
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\instakill.Tests.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\instakill.Tests.pdb
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\instakill.DataLayer.Sql.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\instakill.Model.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\instakill.DataLayer.Sql.pdb
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\instakill.Model.pdb
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\bin\Debug\ru\Microsoft.VisualStudio.QualityTools.UnitTestFramework.resources.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\obj\Debug\instakill.Tests.dll
+C:\Users\halop\Desktop\instakill\project\instakill\instakill.Tests\obj\Debug\instakill.Tests.pdb

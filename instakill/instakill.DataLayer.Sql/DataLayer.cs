@@ -26,9 +26,9 @@ namespace instakill.DataLayer.Sql
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    user.IdUser = Guid.NewGuid();
-                    command.CommandText = "insert into Users (IdUser, Nickname, Username, Status) values (@id, @nick, @name, @stat)";
-                    command.Parameters.AddWithValue("@id", user.IdUser);
+                    user.UserId = Guid.NewGuid();
+                    command.CommandText = "insert into Users (UserId, Nickname, Username, Status) values (@id, @nick, @name, @stat)";
+                    command.Parameters.AddWithValue("@id", user.UserId);
                     command.Parameters.AddWithValue("@nick", user.Nickname);
                     command.Parameters.AddWithValue("@name", user.Username);
                     command.Parameters.AddWithValue("@stat", user.Status);
@@ -39,7 +39,32 @@ namespace instakill.DataLayer.Sql
         }
         public Posts AddPost(Posts post)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                using (var command = connection.CreateCommand())
+                {
+
+                    post.PostId = Guid.NewGuid();
+                    if (GetUser(post.UserId) != null)
+                    {
+                        command.CommandText =
+                            "insert into Posts (PostId, UserId, Photo, Date, Hashtag) values (@id, @user, @photo, @date, @hashtag)";
+                        command.Parameters.AddWithValue("@id", post.PostId);
+                        command.Parameters.AddWithValue("@user", post.UserId);
+                        command.Parameters.AddWithValue("@photo", post.Photo);
+                        command.Parameters.AddWithValue("@date", post.Date);
+                        command.Parameters.AddWithValue("@hashtag", post.Hashtag);
+                        command.ExecuteNonQuery();
+                        return post;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
         }
         public Users GetUser(Guid id)
         {
@@ -48,14 +73,14 @@ namespace instakill.DataLayer.Sql
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "select IdUser, Nickname, Username from Users where IdUser = @id";
+                    command.CommandText = "select UserId, Nickname, Username from Users where UserId = @id";
                     command.Parameters.AddWithValue("@id", id);
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
                         return new Users
                         {
-                            IdUser = reader.GetGuid(0),
+                            UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
                             Nickname = reader.GetString(1)
                         };
                     }
@@ -65,12 +90,48 @@ namespace instakill.DataLayer.Sql
 
         public Posts GetPost(Guid postId)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select PostId, UserId, Photo, Date, Hashtag from Posts where PostId = @id";
+                    command.Parameters.AddWithValue("@id", postId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+                        return new Posts
+                        {
+                            PostId = reader.GetGuid(0),
+                            UserId = reader.GetGuid(1),
+                            Photo = reader.GetString(2) ,
+                            Date = reader.GetDateTime(3) ,
+                            Hashtag = reader.GetString(4) 
+
+                        };
+                    }
+                }
+            }
         }
 
-        public Comments AddCommentToPost(Comments text, Comments idFrom, Posts idPosts)          
+        public Comments AddCommentToPost(Guid postId, Comments comment)         
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    comment.ComId = Guid.NewGuid();
+                    command.CommandText = "insert into Comments (ComId, PostId, FromId, Text, Date) values (@comid, @postid, @fromid, @text, @date)";
+                    command.Parameters.AddWithValue("@comid", comment.ComId);
+                    command.Parameters.AddWithValue("@postid", postId);
+                    command.Parameters.AddWithValue("@fromid", comment.FromId);
+                    command.Parameters.AddWithValue("@text", comment.Text);
+                    command.Parameters.AddWithValue("@date", comment.Date); 
+                    command.ExecuteNonQuery();
+                    return comment;
+                }
+            }
         }
 
         public Comments GetPostComments(Guid postId)
@@ -78,15 +139,28 @@ namespace instakill.DataLayer.Sql
             throw new NotImplementedException(); 
             
         }
-        /*pubic Posts GetLatestPosts(Guid id) //по id пользователя
+
+        
+        public Posts GetLatestPosts(Guid id) //по id пользователя
         {
             throw new NotImplementedException(); 
             
-        }*/
+        }
 
-        public Likes AddLike(Likes like) //user - лайкнувший
+        public Likes AddLike(Likes like) //userid - лайкнувший, postid - какой пост лайкнул 
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {                     
+                    command.CommandText = "insert into Likes (PostId, UserId) values (@postid, @userid)";
+                    command.Parameters.AddWithValue("@postid", like.PostId);
+                    command.Parameters.AddWithValue("@userid", like.UserId);
+                    command.ExecuteNonQuery();
+                    return like;
+                }
+            }
         }
 
         public Likes GetPostLikes(Guid postId)
