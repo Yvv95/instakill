@@ -71,6 +71,27 @@ namespace instakill.Tests
             var resultUser = dataLayer.GetUser(user.UserId);
             Assert.AreEqual(user.Nickname, resultUser.Nickname);
         }
+
+        [TestMethod]
+        public void DeleteUserTest()
+        {
+            var user = new Users
+            {
+                UserId = Guid.NewGuid(),
+                Nickname = Guid.NewGuid().ToString().Substring(10),
+                Username = "test",
+                Status = "status"
+            };
+            //act
+            var dataLayer = new DataLayer.Sql.DataLayer(ConnectionString);
+            user = dataLayer.AddUser(user);
+            //asserts
+            var resultUser = dataLayer.GetUser(user.UserId);
+            dataLayer.DeleteUser(user.UserId);
+            //user = dataLayer.GetUser(user.UserId);
+            Assert.AreEqual(user.Nickname, null);
+        }
+
         /*
         [TestMethod]
         public void ShouldAddLike()

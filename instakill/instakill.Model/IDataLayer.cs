@@ -13,10 +13,12 @@ namespace instakill.Model
         Users GetUser(Guid id);
         Posts GetPost(Guid postId);
         Comments AddCommentToPost(Guid postId, Comments comment);
-        Comments GetPostComments(Guid postId);
-        //Posts GetLatestPosts(Guid id); //по id пользователя
+        List<Comments> GetPostComments(Guid postId);
+        List<Posts> GetLatestPosts(Guid id); //по id пользователя
         Likes AddLike(Likes like);//user - лайкнувший
-        Likes GetPostLikes(Guid postId);
-
+        List<Likes> GetPostLikes(Guid postId);
+        void DeleteUser(Guid id);
+        void DeletePost(Guid postId);
+        void DeleteLike(Guid postId, Guid userId);
     }
 }

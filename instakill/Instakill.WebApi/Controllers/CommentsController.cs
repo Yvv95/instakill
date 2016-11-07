@@ -26,7 +26,7 @@ namespace Instakill.WebApi.Controllers
         }
         [HttpGet]
         [Route("api/comments/{id}")]
-        public Comments GetComments(Guid postId)
+        public List<Comments> GetComments(Guid postId)
         {
             return _dataLayer.GetPostComments(postId);
         }

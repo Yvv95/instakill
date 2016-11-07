@@ -49,8 +49,7 @@ namespace instakill.DataLayer.Sql
                     post.PostId = Guid.NewGuid();
                     if (GetUser(post.UserId) != null)
                     {
-                        command.CommandText =
-                            "insert into Posts (PostId, UserId, Photo, Date, Hashtag) values (@id, @user, @photo, @date, @hashtag)";
+                        command.CommandText ="insert into Posts (PostId, UserId, Photo, Date, Hashtag) values (@id, @user, @photo, @date, @hashtag)";
                         command.Parameters.AddWithValue("@id", post.PostId);
                         command.Parameters.AddWithValue("@user", post.UserId);
                         command.Parameters.AddWithValue("@photo", post.Photo);
@@ -134,17 +133,60 @@ namespace instakill.DataLayer.Sql
             }
         }
 
-        public Comments GetPostComments(Guid postId)
+        public List<Comments> GetPostComments(Guid postId)
         {
-            throw new NotImplementedException(); 
-            
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select UserId, Photo, Date, Hashtag, PostId from Posts where PostId = @id";
+                    command.Parameters.AddWithValue("@id", postId);
+                    List<Comments> coms = new List<Comments>();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+                        Comments somecom = new Comments
+                        {
+                            ComId = reader.GetGuid(0),
+                            PostId = reader.GetGuid(1),
+                            FromId = reader.GetGuid(2),
+                            Text = reader.GetString(3),
+                            Date = reader.GetDateTime(4)
+                        };
+                        coms.Add(somecom);
+                    }
+                    return coms;
+                }
+            }
         }
 
-        
-        public Posts GetLatestPosts(Guid id) //по id пользователя
+        public List<Posts> GetLatestPosts(Guid id) //по id пользователя
         {
-            throw new NotImplementedException(); 
-            
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select PostId, UserId, Photo, Date, Hashtag from Posts where UserId = @id";
+                    command.Parameters.AddWithValue("@id", id);
+                    List <Posts> posts = new List<Posts>();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+                        Posts somepost = new Posts
+                        {
+                            PostId = reader.GetGuid(0),
+                            UserId = reader.GetGuid(1),
+                            Photo = reader.GetString(2),
+                            Date = reader.GetDateTime(3),
+                            Hashtag = reader.GetString(4)
+                        };
+                        posts.Add(somepost);
+                    }
+                    return posts;
+                }
+            }
         }
 
         public Likes AddLike(Likes like) //userid - лайкнувший, postid - какой пост лайкнул 
@@ -163,10 +205,76 @@ namespace instakill.DataLayer.Sql
             }
         }
 
-        public Likes GetPostLikes(Guid postId)
+        public List<Likes> GetPostLikes(Guid postId)
         {
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select PostId, UserId from Likes where PostId = @id";
+                    command.Parameters.AddWithValue("@id", postId);
+                    List<Likes> likes = new List<Likes>();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+                        Likes somelike = new Likes
+                        {
+                            PostId = reader.GetGuid(0),
+                            UserId = reader.GetGuid(1)              
+                        };
+                        likes.Add(somelike);
+                    }
+                    return likes;
+                }
+            }
         }
+
+        public void DeleteUser(Guid id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "delete from Users where UserId = @userid";             
+                    command.Parameters.AddWithValue("@userid", id);
+                    command.ExecuteNonQuery();                  
+                }
+            }           
+        }
+
+        public void DeletePost(Guid postId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "delete from Posts where PostId = @postid";
+                    command.Parameters.AddWithValue("@postid", postId);
+                    command.ExecuteNonQuery();
+                }
+            }
+
+        }
+
+        public void DeleteLike(Guid postId, Guid userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "delete from Likes where PostId = @postid and UserId = @userid";
+                    command.Parameters.AddWithValue("@postid", postId);
+                    command.Parameters.AddWithValue("@userid", userId);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+
 
 
     }
