@@ -20,3 +20,7 @@ C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\bin\Deb
 C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\obj\Debug\instakill.Tests.csprojResolveAssemblyReference.cache
 C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\obj\Debug\instakill.Tests.dll
 C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\obj\Debug\instakill.Tests.pdb
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.xml
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\bin\Debug\NLog.dll
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\bin\Debug\NLog.xml
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Tests\bin\Debug\NLog.config

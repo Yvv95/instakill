@@ -15,15 +15,13 @@
         <WebProjectProperties>
           <StartPageUrl>
           </StartPageUrl>
-          <StartAction>CurrentPage</StartAction>
+          <StartAction>URL</StartAction>
           <AspNetDebugging>True</AspNetDebugging>
           <SilverlightDebugging>False</SilverlightDebugging>
           <NativeDebugging>False</NativeDebugging>
-          <SQLDebugging>False</SQLDebugging>
-          <ExternalProgram>
-          </ExternalProgram>
-          <StartExternalURL>
-          </StartExternalURL>
+          <SQLDebugging>True</SQLDebugging>
+          <ExternalProgram>C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</ExternalProgram>
+          <StartExternalURL>http://localhost:1432/api/</StartExternalURL>
           <StartCmdLineArguments>
           </StartCmdLineArguments>
           <StartWorkingDirectory>

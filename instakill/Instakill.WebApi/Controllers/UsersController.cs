@@ -13,13 +13,18 @@ namespace Instakill.WebApi.Controllers
 {
     public class UsersController : ApiController
     {
+        
         private const string ConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=instakill;Integrated Security=True";
         private readonly IDataLayer _dataLayer;
         public UsersController()
         {
             _dataLayer = new DataLayer(ConnectionString);
         }
+        [HttpDelete]
+        //smth here
+
         [HttpPost]
+        [Route("api/users")]
         public Users CreateUser(Users user)
         {
             return _dataLayer.AddUser(user);
