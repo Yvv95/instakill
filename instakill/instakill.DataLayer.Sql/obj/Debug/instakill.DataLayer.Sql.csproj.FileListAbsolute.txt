@@ -12,3 +12,6 @@ C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql
 C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql\obj\Debug\instakill.DataLayer.Sql.csprojResolveAssemblyReference.cache
 C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql\obj\Debug\instakill.DataLayer.Sql.dll
 C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql\obj\Debug\instakill.DataLayer.Sql.pdb
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql\bin\Debug\NLog.dll
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql\bin\Debug\NLog.xml
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.DataLayer.Sql\bin\Debug\NLog.config

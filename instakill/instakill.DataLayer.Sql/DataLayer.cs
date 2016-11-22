@@ -5,17 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using instakill.Model;
 using System.Data.SqlClient;
+using NLog;
 
 namespace instakill.DataLayer.Sql
 {
     public class DataLayer : IDataLayer
     {
         private readonly string _connectionString;
+        //private static Logger logger = LogManager.GetCurrentClassLogger();
+        
         public DataLayer(string connectionString)
         {
             if (connectionString == null)
                 throw new ArgumentNullException(nameof(connectionString));
-
             _connectionString = connectionString;
         }
 
@@ -33,7 +35,8 @@ namespace instakill.DataLayer.Sql
                     command.Parameters.AddWithValue("@name", user.Username);
                     command.Parameters.AddWithValue("@stat", user.Status);
                     command.ExecuteNonQuery();
-                    return user;
+                    //logger.Info("Добавлен пользователь с номером "+user.UserId.ToString());
+                    return user;                   
                 }
             }
         }
@@ -56,10 +59,12 @@ namespace instakill.DataLayer.Sql
                         command.Parameters.AddWithValue("@date", post.Date);
                         command.Parameters.AddWithValue("@hashtag", post.Hashtag);
                         command.ExecuteNonQuery();
+                        //logger.Trace("Добавлен пост у пользователя " + post.UserId.ToString());
                         return post;
                     }
                     else
                     {
+                        //logger.Error("Не удалось добавить пост пользователю " + post.UserId.ToString());
                         return null;
                     }
                 }
@@ -69,14 +74,17 @@ namespace instakill.DataLayer.Sql
         {
             using (var connection = new SqlConnection(_connectionString))
             {
+                Logger logger = LogManager.GetCurrentClassLogger();
                 connection.Open();
+                //logger.Info("Попытка просмотреть пользователя");
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = "select UserId, Nickname, Username from Users where UserId = @id";
                     command.Parameters.AddWithValue("@id", id);
                     using (var reader = command.ExecuteReader())
-                    {
+                    {                    
                         reader.Read();
+                        logger.Info("Просмотрен пользователь с id = "+"'"+ id.ToString()+"'");
                         return new Users
                         {
                             UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
@@ -91,6 +99,7 @@ namespace instakill.DataLayer.Sql
         {
             using (var connection = new SqlConnection(_connectionString))
             {
+                Logger logger = LogManager.GetCurrentClassLogger();
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
@@ -99,6 +108,7 @@ namespace instakill.DataLayer.Sql
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
+                        logger.Info("Просмотрен пост №'" + postId.ToString()+"'"+ " Дата:"+ reader.GetDateTime(3));
                         return new Posts
                         {
                             PostId = reader.GetGuid(0),
@@ -106,7 +116,6 @@ namespace instakill.DataLayer.Sql
                             Photo = reader.GetString(2) ,
                             Date = reader.GetDateTime(3) ,
                             Hashtag = reader.GetString(4) 
-
                         };
                     }
                 }
@@ -137,12 +146,14 @@ namespace instakill.DataLayer.Sql
         {
             using (var connection = new SqlConnection(_connectionString))
             {
+                Logger logger = LogManager.GetCurrentClassLogger();
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
                     command.CommandText = "select UserId, Photo, Date, Hashtag, PostId from Posts where PostId = @id";
                     command.Parameters.AddWithValue("@id", postId);
                     List<Comments> coms = new List<Comments>();
+                    string temp;
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
@@ -156,6 +167,7 @@ namespace instakill.DataLayer.Sql
                         };
                         coms.Add(somecom);
                     }
+                    logger.Info("Загружены комментарии с поста № '"+ postId + "'");
                     return coms;
                 }
             }
@@ -200,6 +212,7 @@ namespace instakill.DataLayer.Sql
                     command.Parameters.AddWithValue("@postid", like.PostId);
                     command.Parameters.AddWithValue("@userid", like.UserId);
                     command.ExecuteNonQuery();
+                    //logger.Trace("Пользователь " + like.UserId.ToString()+" поставил лайк к посту " + like.PostId.ToString());
                     return like;
                 }
             }
@@ -239,7 +252,8 @@ namespace instakill.DataLayer.Sql
                 {
                     command.CommandText = "delete from Users where UserId = @userid";             
                     command.Parameters.AddWithValue("@userid", id);
-                    command.ExecuteNonQuery();                  
+                    command.ExecuteNonQuery();
+                    //logger.Trace("Пользователь "+id.ToString()+" удалён");
                 }
             }           
         }
