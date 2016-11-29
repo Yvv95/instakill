@@ -20,24 +20,34 @@ namespace Instakill.WebApi.Controllers
         {
             _dataLayer = new DataLayer(ConnectionString);
         }
-        //[HttpDelete]
-        //smth here
+  
 
-        [HttpPost]      
+        [HttpPost] //ok            
         public Users CreateUser(Users user)
         {
             return _dataLayer.AddUser(user);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpDelete]//ok
+        [Route("api/users/{id}")]
         public void DelUser(Guid id)
         {
             _dataLayer.DeleteUser(id);
+            //return !(_dataLayer.IsUser(id));
         }
-        [HttpGet]
+        [HttpGet] //ok
         [Route("api/users/{id}")]
         public Users GetUser(Guid id)
         {
+            return _dataLayer.GetUser(id);
+        }
+
+        [HttpPost] //ok
+        [Route("api/users/{id}")]
+        public Users UpdateUser(Guid id, Users newuser)
+        {
+            newuser.UserId = id;
+            _dataLayer.UpdateUser(id, newuser);
             return _dataLayer.GetUser(id);
         }
 
