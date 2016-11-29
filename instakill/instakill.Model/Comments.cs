@@ -13,5 +13,6 @@ namespace instakill.Model
         public Guid FromId { get; set; }
         public string Text { get; set; }
         public DateTime Date { get; set; }
+        public List<string> ComHashtags { get; set; }
     }
 }

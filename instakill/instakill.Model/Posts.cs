@@ -12,6 +12,11 @@ namespace instakill.Model
         public Guid UserId { get; set; }
         public string Photo { get; set; }
         public DateTime Date { get; set; }
-        public string Hashtag { get; set; }
+        public List<Users> WhoLikes { get; set; }
+        public List<Comments> AllComments { get; set; }
+        public Posts()
+        {
+            WhoLikes = new List<Users>();
+        }
     }
 }

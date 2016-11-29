@@ -11,9 +11,15 @@ namespace instakill.Model
         public Guid UserId { get; set; }
         public string Nickname { get; set; }
         public string Username { get; set; }
-        public string Status { get; set; }
+        public string Info { get; set; }
         //представляет собой фразу/предложение, а не социальный статус 
-
-    }
+        public List<Users> Followers { get; set;}
+        public List<Users> Subscriptions { get; set; }
+        public Users()
+        {
+            Followers = new List<Users>();
+            Subscriptions = new List<Users>();
+        }
+    } 
 }
 
