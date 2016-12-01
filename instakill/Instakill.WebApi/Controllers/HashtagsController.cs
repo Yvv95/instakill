@@ -8,49 +8,30 @@ using instakill.Model;
 using instakill.DataLayer;
 using instakill.DataLayer.Sql;
 
-
 namespace Instakill.WebApi.Controllers
 {
-    public class UsersController : ApiController
+    public class HashtagsController : ApiController
     {
-
         private const string ConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=instakill;Integrated Security=True";
         //private const string ConnectionString = @"Server=tcp:instakill.database.windows.net,1433;Initial Catalog=Instagramm;Persist Security Info=False;User ID=Valera;Password=Instakill1;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         private readonly IDataLayer _dataLayer;
-        public UsersController()
+        public HashtagsController()
         {
             _dataLayer = new DataLayer(ConnectionString);
         }
-  
-
-        [HttpPost] //ok            
-        public Users CreateUser(Users user)
+        [HttpPost]//добавляет в БД, но не к комментариям
+        [Route("api/tags/{hashtag}")]
+        public void AddTag(Comments com, string hashtag)
         {
-            return _dataLayer.AddUser(user);
+            _dataLayer.AddHashtag(com, hashtag);           
         }
-
-        [HttpDelete]//ok
-        [Route("api/users/{id}")]
-        public void DelUser(Guid id)
+        [HttpGet]//прилетает только первый хештег
+        [Route("api/tags/")]
+        public List<string> GetAllHashtags(Comments comment)
         {
-            _dataLayer.DeleteUser(id);
-            //return !(_dataLayer.IsUser(id));
+            //Guid postid = _dataLayer.GetPost(id);
+            return _dataLayer.GetHashtags(comment);
         }
-        [HttpGet] //ok
-        [Route("api/users/{id}")]
-        public Users GetUser(Guid id)
-        {
-            return _dataLayer.GetUser(id);
-        }
-
-        [HttpPost] //ok
-        [Route("api/users/{id}")]
-        public Users UpdateUser(Guid id, Users newuser)
-        {
-            newuser.UserId = id;
-            _dataLayer.UpdateUser(id, newuser);
-            return _dataLayer.GetUser(id);
-        }
-
+        //to be continued
     }
 }

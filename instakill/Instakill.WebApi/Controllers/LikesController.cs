@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,49 +9,34 @@ using instakill.Model;
 using instakill.DataLayer;
 using instakill.DataLayer.Sql;
 
-
 namespace Instakill.WebApi.Controllers
 {
-    public class UsersController : ApiController
+    public class LikesController : ApiController
     {
-
         private const string ConnectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=instakill;Integrated Security=True";
         //private const string ConnectionString = @"Server=tcp:instakill.database.windows.net,1433;Initial Catalog=Instagramm;Persist Security Info=False;User ID=Valera;Password=Instakill1;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         private readonly IDataLayer _dataLayer;
-        public UsersController()
+        public LikesController()
         {
             _dataLayer = new DataLayer(ConnectionString);
         }
-  
 
-        [HttpPost] //ok            
-        public Users CreateUser(Users user)
+        [HttpPost]//ok            
+        public Likes CreateLike(Likes like)
         {
-            return _dataLayer.AddUser(user);
+            return _dataLayer.AddLike(like);
         }
 
+        [HttpGet]//ok
+        [Route("api/likes/{id}/users")]
+        public List<Users> GetLikes(Guid id)
+        {
+            return _dataLayer.GetPostLikes(id);
+        }
         [HttpDelete]//ok
-        [Route("api/users/{id}")]
-        public void DelUser(Guid id)
-        {
-            _dataLayer.DeleteUser(id);
-            //return !(_dataLayer.IsUser(id));
+        public void DeleteUsersLike(Likes like)
+        {           
+            _dataLayer.DeleteLike(like.PostId, like.UserId);           
         }
-        [HttpGet] //ok
-        [Route("api/users/{id}")]
-        public Users GetUser(Guid id)
-        {
-            return _dataLayer.GetUser(id);
-        }
-
-        [HttpPost] //ok
-        [Route("api/users/{id}")]
-        public Users UpdateUser(Guid id, Users newuser)
-        {
-            newuser.UserId = id;
-            _dataLayer.UpdateUser(id, newuser);
-            return _dataLayer.GetUser(id);
-        }
-
     }
 }

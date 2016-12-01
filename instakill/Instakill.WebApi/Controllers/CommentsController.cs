@@ -19,16 +19,31 @@ namespace Instakill.WebApi.Controllers
         {
             _dataLayer = new DataLayer(ConnectionString);
         }
-        [HttpPost]
-        public Comments AddCommentToPost(Guid postId, Comments comment)
-        {
-            return _dataLayer.AddCommentToPost(postId,  comment);
-        }
-        [HttpGet]
+        [HttpPost]//ok
         [Route("api/comments/{id}")]
-        public List<Comments> GetComments(Guid postId)
+        public Comments AddCommentToPost(Guid id, Comments comment)
         {
-            return _dataLayer.GetPostComments(postId);
+            return _dataLayer.AddCommentToPost(id,  comment);
+        }
+       
+        [HttpPost]//ok
+        [Route("api/comments/")]
+        public Comments UpdateComment(Comments com)
+        {
+            _dataLayer.UpdateComment(com);
+            return _dataLayer.GetComment(com.ComId);
+        }
+        [HttpDelete]//ok
+        [Route("api/comments/{id}")]
+        public void DeleteComment(Guid id)
+        {
+            _dataLayer.DeleteComment(id);
+        }
+        [HttpGet]//ok
+        [Route("api/comments/{id}")]
+        public Comments GetComment(Guid id)
+        {
+            return _dataLayer.GetComment(id);
         }
     }
 }
