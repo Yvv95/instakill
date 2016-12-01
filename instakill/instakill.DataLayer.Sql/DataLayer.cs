@@ -19,8 +19,6 @@ namespace instakill.DataLayer.Sql
                 throw new ArgumentNullException(nameof(connectionString));
             _connectionString = connectionString;
         }
-
-       
         public Users AddUser(Users user)
         {
             logger.Info("Попытка создания пользователя "+ user.Nickname);
@@ -153,11 +151,11 @@ namespace instakill.DataLayer.Sql
                 }
             }
         }
-        public bool AddCommentToPost(Guid postId, Comments com)
+        public Comments AddCommentToPost(Guid postId, Comments com)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                if (GetUser(com.FromId).UserId != Guid.Empty)
+                if (GetPost(postId).PostId != Guid.Empty)
                 {
                     connection.Open();
                     using (var command = connection.CreateCommand())
@@ -168,40 +166,71 @@ namespace instakill.DataLayer.Sql
                         command.Parameters.AddWithValue("@postid", postId);
                         command.Parameters.AddWithValue("@fromid", com.FromId);
                         command.Parameters.AddWithValue("@text", com.Text);
-                        command.Parameters.AddWithValue("@date", DateTime.Now);
+                        com.Date = DateTime.Now;
+                        command.Parameters.AddWithValue("@date", com.Date);
                         command.ExecuteNonQuery();
                         logger.Info("Пользователь {0} добавил комментарий {1}  к посту {2}", com.FromId, com.Text, postId);
-                        return true;
+                        return com;
                     }
                 }
                 logger.Info("Не удалось добавить комментарий {0}  к посту {1}", com.Text, postId);
-                return false;
+                return new Comments();
             }
         }
-
-        public bool UpdateComment(Guid comId, string comNew)
+        public Comments GetComment(Guid id)
         {
-            logger.Info("Начато удаление комментария " + comId);
+            logger.Info("Загрузка комментария {0}", id);
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    if (IsComment(comId))
+                    command.CommandText = @"select PostId, FromId, Text, Date, ComId from Comments where ComId = @id";
+                    command.Parameters.AddWithValue("@id", id);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+                        if (reader.HasRows)
+                        {
+                            logger.Info("Просмотрен комментарий {0} | Дата комментария:{1}", id, reader.GetDateTime(3));
+                            return new Comments
+                            {
+                                ComId = reader.GetGuid(reader.GetOrdinal(@"ComId")),
+                                PostId = reader.GetGuid(reader.GetOrdinal(@"PostId")),
+                                Text = reader.GetString(reader.GetOrdinal(@"Text")),
+                                FromId = reader.GetGuid(reader.GetOrdinal(@"FromId")),
+                                Date = reader.GetDateTime(reader.GetOrdinal(@"Date")),
+                            };
+                        }
+                        logger.Error("Не найден комментарий " + id);
+                        return new Comments();
+                    }
+                }
+            }
+
+        }
+        public bool UpdateComment(Comments comNew)
+        {
+            logger.Info("Начато изменение комментария " + comNew.ComId);
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    if (GetComment(comNew.ComId).ComId!=Guid.Empty)
                     {
                         command.CommandText = "update Comments set Text = @text where ComId = @comid";
-                        command.Parameters.AddWithValue("@comid", comId);
-                        command.Parameters.AddWithValue("@text", comNew);
+                        command.Parameters.AddWithValue("@comid", comNew.ComId);
+                        command.Parameters.AddWithValue("@text", comNew.Text);
                         command.ExecuteNonQuery();
-                        logger.Info("Комментарий {0} изменён на {1}",comId,comNew);
+                        logger.Info("Комментарий {0} изменён на {1}", comNew.ComId, comNew.Text);
                         return true;
                     }        
-                        logger.Info("Не удалось изменить комментарий " + comId);
+                        logger.Info("Не удалось изменить комментарий " + comNew.ComId);
                         return false;            
                 }
             }
         }
-
         public bool IsComment(Guid comId)
         {
             logger.Info("Поиск комментария " + comId);
@@ -210,8 +239,8 @@ namespace instakill.DataLayer.Sql
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"select FromId, PostId, ComId from Comments where @ComId = id";
-                    command.Parameters.AddWithValue(@"id", comId);
+                    command.CommandText = @"select FromId, PostId, ComId from Comments where ComId=@ComId";
+                    command.Parameters.AddWithValue(@"ComId", comId);
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
@@ -226,7 +255,6 @@ namespace instakill.DataLayer.Sql
                 }
             }
         }
-
         public void DeleteComment(Guid comId)
         {
             logger.Info("Начато удаление комментария " + comId);
@@ -251,13 +279,13 @@ namespace instakill.DataLayer.Sql
         }
         public bool IsUser(Guid id)
         {
-            logger.Info("Поиск пользователя " + id);
+            logger.Info("Поиск пользователя {0}", id);
             using (var connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"select UserId, Nickname from Users where @UserId = id";
+                    command.CommandText = @"select UserId, Nickname from Users where UserId = @id";
                     command.Parameters.AddWithValue(@"id", id);
                     using (var reader = command.ExecuteReader())
                     {
@@ -273,7 +301,6 @@ namespace instakill.DataLayer.Sql
                 }
             }
         }
-
         public bool ExistsPost(Guid postId)
         {
             logger.Info("Поиск поста " + postId);
@@ -362,25 +389,28 @@ namespace instakill.DataLayer.Sql
                     List<Posts> posts = new List<Posts>();
                     using (var reader = command.ExecuteReader())
                     {
-                        reader.Read();
-                        Posts somepost = new Posts
+
+                        while (reader.Read())
                         {
-                            PostId = reader.GetGuid(reader.GetOrdinal("PostId")),
-                            UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
-                            Photo = reader.GetString(reader.GetOrdinal("Photo")),
-                            Date = reader.GetDateTime(reader.GetOrdinal("Date"))
-                        };
-                        posts.Add(somepost);
+                            Posts somepost = new Posts
+                            {
+                                PostId = reader.GetGuid(reader.GetOrdinal("PostId")),
+                                UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
+                                Photo = reader.GetString(reader.GetOrdinal("Photo")),
+                                Date = reader.GetDateTime(reader.GetOrdinal("Date"))
+                            };
+                            posts.Add(somepost);
+                        }
                     }
                     logger.Info("Загружена стена пользователя " + id);
                     return posts;
                 }
             }
         }
-        public bool AddLike(Likes like) //userid - лайкнувший, postid - какой пост лайкнул
+        public Likes AddLike(Likes like) //userid - лайкнувший, postid - какой пост лайкнул
         {
             logger.Info("Добавление лайка к посту "+like.PostId);
-            if ((GetPost(like.PostId)!=null)&&(IsLiked(like.PostId, like.UserId)))
+            if (GetPost(like.PostId)!=new Posts())//&&(IsLiked(like.PostId, like.UserId)))
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
@@ -392,17 +422,17 @@ namespace instakill.DataLayer.Sql
                         command.Parameters.AddWithValue("@userid", like.UserId);
                         command.ExecuteNonQuery();
                         logger.Info("Добавлен лайк к посту " + like.UserId);
-                        return true;
+                        return like;
                     }
                 }
             }
             logger.Info("Не удалось поставить лайк к посту "+like.UserId);
-            return false;
+            return new Likes();
         }
-        public List<Likes> GetPostLikes(Guid postId)
+        public List<Users> GetPostLikes(Guid postId)
         {
-            if (ExistsPost(postId))
-            {
+            //if (ExistsPost(postId))
+            //{
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
@@ -410,22 +440,25 @@ namespace instakill.DataLayer.Sql
                     {
                         command.CommandText = "select PostId, UserId from Likes where PostId = @id";
                         command.Parameters.AddWithValue("@id", postId);
-                        List<Likes> likes = new List<Likes>();
+                        List<Users> likes = new List<Users>();
                         using (var reader = command.ExecuteReader())
                         {
-                            reader.Read();
-                            Likes somelike = new Likes
+                            while (reader.Read())
                             {
-                                PostId = reader.GetGuid(reader.GetOrdinal("PostId")),
-                                UserId = reader.GetGuid(reader.GetOrdinal("UserId"))
-                            };
-                            likes.Add(somelike);
+                                Likes somelike = new Likes
+                                {
+                                    PostId = reader.GetGuid(reader.GetOrdinal("PostId")),
+                                    UserId = reader.GetGuid(reader.GetOrdinal("UserId"))
+                                };
+
+                                likes.Add(GetUser(somelike.UserId));
+                            }
                         }
                         logger.Info("Просмотрены лайки с поста " + postId);
                         return likes;
                     }
                 }
-            }
+            //}
             logger.Warn("При просмотре лайков не удалось обнаружить комментарий");
             throw new ArgumentException();
         }
@@ -475,21 +508,21 @@ namespace instakill.DataLayer.Sql
         }
         public void DeleteLike(Guid postId, Guid userId)
         {
-            if (ExistsPost(postId))
+            if (GetPost(postId).PostId!=Guid.Empty)
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
                     using (var command = connection.CreateCommand())
                     {
-                        if (IsLiked(postId, userId))
-                        {
+                        //if (IsLiked(postId, userId))
+                        //{
                             command.CommandText = "delete from Likes where PostId = @postid and UserId = @userid";
                             command.Parameters.AddWithValue("@postid", postId);
                             command.Parameters.AddWithValue("@userid", userId);
                             command.ExecuteNonQuery();
                             logger.Info("Пользователь " + userId + " убрал лайк с поста " + postId);
-                        }
+                        //}
                     }
                 }
             }
@@ -521,7 +554,7 @@ namespace instakill.DataLayer.Sql
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"select ComId, Text from Hashtags where Text = @tag";
+                    command.CommandText = @"select ComId from Hashtags where Text = @tag";
                     command.Parameters.AddWithValue("@tag", hashtag);
                     using (var reader = command.ExecuteReader())
                     {
@@ -548,17 +581,26 @@ namespace instakill.DataLayer.Sql
         }
         public void AddHashtag(Comments com, string hashtag)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            if (GetComment(com.ComId).ComId != Guid.Empty)
             {
-                connection.Open();
-                using (var command = connection.CreateCommand())
+                using (var connection = new SqlConnection(_connectionString))
                 {
-                    command.CommandText = @"insert into Hashtags (ComId, Text ) values(@comid, @tag)";
-                    command.Parameters.AddWithValue("@comid", com.ComId);
-                    command.Parameters.AddWithValue("@tag", hashtag);
-                    command.ExecuteNonQuery();
-                    logger.Info("Добавлен хэштег {0} к посту {1}", hashtag, com.ComId);
+                    connection.Open();
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandText = @"insert into Hashtags (ComId, Text ) values(@comid, @tag)";
+                        command.Parameters.AddWithValue("@comid", com.ComId);
+                        command.Parameters.AddWithValue("@tag", hashtag);
+                        //com.ComHashtags.Add(hashtag);
+                        command.ExecuteNonQuery();
+                        logger.Info("Добавлен хэштег {0} к посту {1}", hashtag, com.ComId);
+                    }
                 }
+            }
+            else
+            {
+                logger.Warn("Комментарий не существует");
+                throw new ArgumentException();
             }
         }
         public List<string> GetHashtags(Comments comment)
@@ -573,15 +615,172 @@ namespace instakill.DataLayer.Sql
                     List<string> tags = new List<string>();
                     using (var reader = command.ExecuteReader())
                     {
-                        reader.Read();
-                        tags.Add(reader.GetString(reader.GetOrdinal("Text")));
+                        while (reader.Read())
+                        {
+                            tags.Add(reader.GetString(reader.GetOrdinal("Text")));
+                        }
                     }
                     logger.Info("Загружены теги с комментария {0}", comment.ComId);
                     return tags;
                 }
             }
         }
+        public bool IsFollower(Users user, Users userFollow)
+        {
+            logger.Info("Проверка подписки");
+            if (IsUser(user.UserId))
+            {
+                if (IsUser(userFollow.UserId))
+                {
+                    using (var connection = new SqlConnection(_connectionString))
+                    {
+                        connection.Open();
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = @"select UserId from Subscribers where UserId = @userid and SubscrId = @subscription_id";
+                            command.Parameters.AddWithValue(@"userid", user.UserId);
+                            command.Parameters.AddWithValue(@"subscription_id", userFollow.UserId);
 
+                            using (var reader = command.ExecuteReader())
+                            {
+                                reader.Read();
+                                logger.Info(reader.HasRows ? "Подписка найдена" : "Подписка не найдена");
+                                return reader.HasRows;
+                            }
+                        }
+                    }
+                }
+                logger.Warn("Пользователь с id = {0} не найден.", userFollow.UserId);
+                return false;
+            }
+            logger.Warn("Пользователь с id = {0} не найден", user.UserId);
+            return false;
+        }
+        public List<Users> GetFollowers(Users user)
+        {
+            if (!IsUser(user.UserId)) throw new ArgumentException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                List<Users> followers = new List<Users>();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select UserId, SubscrId from Subscribers where UserId = @id";
+                    command.Parameters.AddWithValue(@"id", user.UserId);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var newfollower = new Users
+                            {
+                                UserId = reader.GetGuid(reader.GetOrdinal(@"SubscrId"))
+                            };
+                            followers.Add(GetUser(newfollower.UserId));
+                        }
+                    }
+                }
+                return followers;
+            }
+        }
+        public void DeleteFollower(Users user, Users friendUser)
+        {
+            logger.Info("Начато удаление подписчика");
+            if (IsUser(user.UserId))
+            {
+                if (IsUser(friendUser.UserId))
+                {
+                    using (var connection = new SqlConnection(_connectionString))
+                    {
+                        connection.Open();
+                        using (var command = connection.CreateCommand())
+                        {
+                            
+
+                            if (IsFollower(user, friendUser))
+                            {
+                                command.CommandText = @"delete Subscribers where UserId = @user and SubscrId = @folowerid";
+                                command.Parameters.AddWithValue(@"user", user.UserId);
+                                command.Parameters.AddWithValue(@"folowerid", friendUser.UserId);
+                                command.ExecuteNonQuery();
+                                logger.Info(IsFollower(user, friendUser) ? "Подписка не удалена" : "Подписка удалена");
+                            }
+                            else
+                            {
+                                logger.Info("Подписка не существует");
+                            }
+                        }
+                    }
+                }
+                logger.Warn("Подписчик с id = {0} не найден", friendUser.UserId);
+            }
+            logger.Warn("Пользователь с id = {0} не найден", user.UserId);
+        }
+        public void AddSubscription(Guid userId, Users follower)
+        {
+            logger.Info("Добавление подписки");
+
+            if (IsUser(userId))
+            {
+                if (IsUser(follower.UserId))
+                {
+                    using (var connection = new SqlConnection(_connectionString))
+                    {
+                        connection.Open();
+                        using (var command = connection.CreateCommand())
+                        {
+                            if (!IsFollower(GetUser(userId), follower))
+                            {
+                                command.CommandText = @"insert into Subscribers(UserId, SubscrId) values(@user, @follower)";
+                                command.Parameters.AddWithValue(@"user", userId);
+                                command.Parameters.AddWithValue(@"follower", follower.UserId);
+                                command.ExecuteNonQuery();
+                                follower.Subscriptions.Add(GetUser(userId));
+                                logger.Info("Пользователь id = {0} подписался на id = {1}.", follower.UserId, userId);
+                            }
+                            else
+                            {
+                                logger.Info("Неудачная попытка добавления существующей подписки");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    logger.Warn("Не найден пользователь с id = {0}", follower.UserId);
+                }
+            }
+            else
+            {
+                logger.Warn("Не найден пользователь с id = {0}", userId);
+            }
+        }
+        public List<Users> GetFollowing(Users user)
+        {
+            if (!IsUser(user.UserId)) throw new ArgumentException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                List<Users> following = new List<Users>();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select UserId, SubscrId from Subscribers where SubscrId = @id";
+                    command.Parameters.AddWithValue(@"id", user.UserId);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var newfollowing = new Users
+                            {
+                                UserId = reader.GetGuid(reader.GetOrdinal(@"UserId"))
+                            };
+                            following.Add(GetUser(newfollowing.UserId));
+                        }
+                    }
+                }
+                return following;
+            }
+        }
 
     }
 }
