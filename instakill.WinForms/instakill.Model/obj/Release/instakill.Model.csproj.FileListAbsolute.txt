@@ -1,0 +1,11 @@
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\bin\Release\instakill.Model.dll.config
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\bin\Release\instakill.Model.dll
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\bin\Release\instakill.Model.pdb
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\obj\Release\instakill.Model.Properties.Resources.resources
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\obj\Release\instakill.Model.csproj.GenerateResource.Cache
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\obj\Release\instakill.Model.dll
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\obj\Release\instakill.Model.pdb
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\bin\Release\NLog.config
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\bin\Release\NLog.dll
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\bin\Release\NLog.xml
+C:\Users\halop\Desktop\instakill\instakill.git\instakill\instakill.Model\obj\Release\instakill.Model.csprojResolveAssemblyReference.cache
