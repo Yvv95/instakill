@@ -39,6 +39,35 @@ namespace instakill.DataLayer.Sql
                 }
             }
         }
+        public Users GetUserByName(string userName)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select UserId, Nickname, Username, Status from Users where Nickname = @name";
+                    command.Parameters.AddWithValue("@name", userName);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+                        if (reader.HasRows)
+                        {
+                            logger.Info("Просмотрен пользователь с именем = '{0}'", userName);
+                            return new Users
+                            {
+                                UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
+                                Nickname = reader.GetString(reader.GetOrdinal("Nickname")),
+                                Username = reader.GetString(reader.GetOrdinal("Username")),
+                                Info = reader.GetString(reader.GetOrdinal("Status"))
+                            };
+                        }
+                        logger.Error("Просмотр несуществующего пользователя с именем = '{0}'", userName);
+                        return new Users();
+                    }
+                }
+            }
+        }
         public bool UpdateUser(Guid id, Users userChanged)
         {
             logger.Info("Попытка обновления пользователя c id " + id);
@@ -309,17 +338,17 @@ namespace instakill.DataLayer.Sql
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"select UserId, Photo, Date, PostId from Posts where PostId=@postid";
+                    command.CommandText = @"select PostId from Posts where PostId=@postid";
                     command.Parameters.AddWithValue(@"postid", postId);
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
                         if (reader.HasRows)
                         {
-                            logger.Info("Пост найден");
+                            logger.Info("Пост '{0}' найден", postId);
                             return true;
                         }
-                        logger.Info("Пост не найден");
+                        logger.Info("Пост '{0}' не найден", postId);
                         return false;
                     }
                 }
@@ -533,6 +562,7 @@ namespace instakill.DataLayer.Sql
         {
             using (var connection = new SqlConnection(_connectionString))
             {
+                logger.Info("Проверка наличия лайка");
                 connection.Open();
                 using (var command = connection.CreateCommand())
                 {
@@ -542,6 +572,7 @@ namespace instakill.DataLayer.Sql
                     using (var reader = command.ExecuteReader())
                     {
                         reader.Read();
+                        logger.Info("Поиск лайка закончился с {0}", reader.HasRows);
                         return reader.HasRows;
                     }
                 }
