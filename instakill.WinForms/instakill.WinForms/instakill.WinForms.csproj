@@ -57,9 +57,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandWrapper.cs" />
-    <Compile Include="HttpClientWrapper.cs" />
-    <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="SignUp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SignUp.Designer.cs">
+      <DependentUpon>SignUp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SomeUserPage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SomeUserPage.Designer.cs">
+      <DependentUpon>SomeUserPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Start.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,6 +83,18 @@
     <Compile Include="UserPage.Designer.cs">
       <DependentUpon>UserPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Zoom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Zoom.Designer.cs">
+      <DependentUpon>Zoom.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="SignUp.resx">
+      <DependentUpon>SignUp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SomeUserPage.resx">
+      <DependentUpon>SomeUserPage.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Start.resx">
       <DependentUpon>Start.cs</DependentUpon>
     </EmbeddedResource>
@@ -88,6 +109,9 @@
     </Compile>
     <EmbeddedResource Include="UserPage.resx">
       <DependentUpon>UserPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Zoom.resx">
+      <DependentUpon>Zoom.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

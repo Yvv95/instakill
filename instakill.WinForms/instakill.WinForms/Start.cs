@@ -32,7 +32,9 @@ namespace instakill.WinForms
 
         private void signUpbutton_Click(object sender, EventArgs e)
         {
-
+            SignUp frm = new SignUp();
+            this.Hide();
+            frm.Show();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -45,7 +47,7 @@ namespace instakill.WinForms
         private void signIn_Click(object sender, EventArgs e)
         {         
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("http://instagram20161204020526.azurewebsites.net/");
+            client.BaseAddress = new Uri(UserPage.connectionString);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             Guid id = Guid.Empty;
             try
@@ -64,19 +66,27 @@ namespace instakill.WinForms
 
             var url = "api/users/"+id;
             Program.userId = id;
-            HttpResponseMessage response = client.GetAsync(url).Result;
-            if (response.IsSuccessStatusCode)
+
+            try
             {
-                Users user = response.Content.ReadAsAsync<Users>().Result;
-                signIntext.Text = user.Nickname;
-                UserPage frm = new UserPage();
-                this.Hide();
-                frm.Show();
+                HttpResponseMessage response = client.GetAsync(url).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    Users user = response.Content.ReadAsAsync<Users>().Result;
+                    signIntext.Text = user.Nickname;
+                    UserPage frm = new UserPage();
+                    this.Hide();
+                    frm.Show();
+                }
+                else
+                {
+                    signIntext.Text = "Неверные данные";
+                }
             }
-            else
+            catch
             {
-                signIntext.Text="Неверные данные";
-            }          
+                signIntext.Text = "Нет подключения";
+            }
         }
        
     }
