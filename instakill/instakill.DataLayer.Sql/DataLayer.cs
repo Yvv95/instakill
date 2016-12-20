@@ -436,6 +436,35 @@ namespace instakill.DataLayer.Sql
                 }
             }
         }
+        public List<Posts> GetFeedPosts(Guid id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "select Posts.UserId, Posts.PostId, Posts.Photo, Posts.Date from Posts, Subscribers where Subscribers.UserId = Posts.UserId AND Subscribers.SubscrId = @id order by Posts.Date desc";
+                    command.Parameters.AddWithValue("@id", id);
+                    List<Posts> posts = new List<Posts>();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Posts somepost = new Posts
+                            {
+                                PostId = reader.GetGuid(reader.GetOrdinal("PostId")),
+                                UserId = reader.GetGuid(reader.GetOrdinal("UserId")),
+                                Photo = reader.GetString(reader.GetOrdinal("Photo")),
+                                Date = reader.GetDateTime(reader.GetOrdinal("Date"))
+                            };
+                            posts.Add(somepost);
+                        }
+                    }
+                    logger.Info("Загружены новости пользователя " + id);
+                    return posts;
+                }
+            }
+        }
         public Likes AddLike(Likes like) //userid - лайкнувший, postid - какой пост лайкнул
         {
             logger.Info("Добавление лайка к посту "+like.PostId);
