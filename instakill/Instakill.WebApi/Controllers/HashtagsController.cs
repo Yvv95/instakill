@@ -32,6 +32,6 @@ namespace Instakill.WebApi.Controllers
             //Guid postid = _dataLayer.GetPost(id);
             return _dataLayer.GetHashtags(comment);
         }
-        //to be continued
+        //smth add
     }
 }

@@ -42,7 +42,12 @@ namespace Instakill.WebApi.Controllers
         {
             return _dataLayer.GetUser(id);
         }
-
+        [HttpGet] //ok
+        [Route("api/users/name/{name}")]
+        public Users GetUserName(string name)
+        {
+            return _dataLayer.GetUserByName(name);
+        }
         [HttpPost] //ok
         [Route("api/users/{id}")]
         public Users UpdateUser(Guid id, Users newuser)
@@ -51,6 +56,8 @@ namespace Instakill.WebApi.Controllers
             _dataLayer.UpdateUser(id, newuser);
             return _dataLayer.GetUser(id);
         }
+
+        
 
     }
 }

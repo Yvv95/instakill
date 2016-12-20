@@ -47,5 +47,20 @@ namespace Instakill.WebApi.Controllers
             newpost.PostId = id;
             return _dataLayer.GetPost(newpost.PostId);
         }
+
+        [HttpGet] //ok
+        [Route("api/posts/user/{id}")]
+        public List<Posts> LoadPosts(Guid id)
+        {
+            return _dataLayer.GetLatestPosts(id);
+        }
+        [HttpGet] //???
+        [Route("api/posts/feed/{id}")]
+        public List<Posts> GetFeed(Guid id)
+        {
+            return _dataLayer.GetFeedPosts(id);
+        }
+
+
     }
 }
